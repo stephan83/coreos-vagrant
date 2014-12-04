@@ -54,9 +54,6 @@
 #   export DOCKER_TLS_VERIFY=1
 #   export DOCKER_CERT_PATH=/PATH/TO/CERTIFICATES
 #$expose_docker_tcp=2376
-#$tlscacert_path = File.join(File.dirname(__FILE__), "ca.pem")
-#$tlscert_path = File.join(File.dirname(__FILE__), "server-cert.pem")
-#$tlskey_path = File.join(File.dirname(__FILE__), "server-key.pem")
 
 # Setting for VirtualBox VMs
 #$vb_gui = false
