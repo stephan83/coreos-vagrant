@@ -7,6 +7,9 @@ Vagrant.require_version ">= 1.6.0"
 
 CLOUD_CONFIG_PATH = File.join(File.dirname(__FILE__), "user-data")
 CONFIG = File.join(File.dirname(__FILE__), "config.rb")
+TLSCACERT_PATH = File.join(File.dirname(__FILE__), "ca.pem")
+TLSCERT_PATH = File.join(File.dirname(__FILE__), "server-cert.pem")
+TLSKEY_PATH = File.join(File.dirname(__FILE__), "server-key.pem")
 
 # Defaults for config options defined in CONFIG
 $num_instances = 1
@@ -72,7 +75,7 @@ Vagrant.configure("2") do |config|
       end
 
       if $expose_docker_tcp
-        config.vm.network "forwarded_port", guest: 2375, host: ($expose_docker_tcp + i - 1), auto_correct: true
+        config.vm.network "forwarded_port", guest: 2376, host: ($expose_docker_tcp + i - 1), auto_correct: true
       end
 
       config.vm.provider :vmware_fusion do |vb|
@@ -90,6 +93,25 @@ Vagrant.configure("2") do |config|
 
       # Uncomment below to enable NFS for sharing the host machine into the coreos-vagrant VM.
       #config.vm.synced_folder ".", "/home/core/share", id: "core", :nfs => true, :mount_options => ['nolock,vers=3,udp']
+
+      # Copy certs
+      if $tlscacert_path and File.exist?($tlscacert_path)
+        config.vm.provision :file, :source => "#{$tlscacert_path}", :destination => "/home/core/.docker/certs/ca.pem"
+        config.vm.provision :shell, :inline => "chown core:docker /home/core/.docker/certs/ca.pem", :privileged => true
+        config.vm.provision :shell, :inline => "chmod 0640 /home/core/.docker/certs/ca.pem", :privileged => true
+      end
+
+      if $tlscert_path and File.exist?($tlscert_path)
+        config.vm.provision :file, :source => "#{$tlscert_path}", :destination => "/home/core/.docker/certs/server-cert.pem"
+        config.vm.provision :shell, :inline => "chown core:docker /home/core/.docker/certs/server-cert.pem", :privileged => true
+        config.vm.provision :shell, :inline => "chmod 0640 /home/core/.docker/certs/server-cert.pem", :privileged => true
+      end
+
+      if $tlskey_path and File.exist?($tlskey_path)
+        config.vm.provision :file, :source => "#{$tlskey_path}", :destination => "/home/core/.docker/certs/server-key.pem"
+        config.vm.provision :shell, :inline => "chown core:docker /home/core/.docker/certs/server-key.pem", :privileged => true
+        config.vm.provision :shell, :inline => "chmod 0640 /home/core/.docker/certs/server-key.pem", :privileged => true
+      end
 
       if File.exist?(CLOUD_CONFIG_PATH)
         config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"

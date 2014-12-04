@@ -36,11 +36,27 @@
 #$enable_serial_logging=false
 
 # Enable port forwarding of Docker TCP socket
-# Set to the TCP port you want exposed on the *host* machine, default is 2375
-# If 2375 is used, Vagrant will auto-increment (e.g. in the case of $num_instances > 1)
-# You can then use the docker tool locally by setting the following env var:
-#   export DOCKER_HOST='tcp://127.0.0.1:2375'
-#$expose_docker_tcp=2375
+# Set to the TCP port you want exposed on the *host* machine, default is 2376
+# If 2376 is used, Vagrant will auto-increment (e.g. in the case of $num_instances > 1)
+#
+# To enable HTTPS (required by recent docker clients) on a dev machine, you should add
+# a host entry to /etc/hosts (eg. 127.0.0.1  core.os) and use the hostname as the server
+# FQDN when creating the certificates.
+#
+# On OSX, you should not use the default openssl tool to generate the certificates.
+# You should install newer versions using homebrew for instance and use the executable
+# directly instead (eg. /usr/local/Cellar/openssl/1.0.1j/bin/openssl ...args)
+#
+# To generate keys,  follow the instructions at https://docs.docker.com/articles/https/
+#
+# You can then use the docker tool locally by setting the following env vars:
+#   export DOCKER_HOST='tcp://core.os:2376'
+#   export DOCKER_TLS_VERIFY=1
+#   export DOCKER_CERT_PATH=/PATH/TO/CERTIFICATES
+#$expose_docker_tcp=2376
+#$tlscacert_path = File.join(File.dirname(__FILE__), "ca.pem")
+#$tlscert_path = File.join(File.dirname(__FILE__), "server-cert.pem")
+#$tlskey_path = File.join(File.dirname(__FILE__), "server-key.pem")
 
 # Setting for VirtualBox VMs
 #$vb_gui = false
